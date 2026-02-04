@@ -4,160 +4,72 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Verification Link Confirmation</title>
-
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f4f6f8;
-      padding: 40px;
-    }
-
-    .container {
-      max-width: 600px;
-      background: #ffffff;
-      padding: 25px;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-
-    label {
-      font-weight: bold;
-      display: block;
-      margin-bottom: 8px;
-    }
-
-    textarea, input {
-      width: 100%;
-      padding: 10px;
-      margin-bottom: 15px;
-      font-size: 15px;
-      border-radius: 4px;
-      border: 1px solid #ccc;
-    }
-
-    textarea {
-      min-height: 100px;
-      resize: vertical;
-    }
-
-    input[readonly] {
-      background: #f1f1f1;
-    }
-
-    button {
-      background: #007bff;
-      color: #ffffff;
-      padding: 10px 18px;
-      font-size: 16px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background: #0056b3;
-    }
-
-    .status {
-      font-size: 14px;
-      margin-bottom: 10px;
-    }
-
-    .success {
-      color: green;
-    }
-
-    .error {
-      color: red;
-    }
+    body { font-family: Arial,sans-serif; background: #f4f6f8; padding: 40px; }
+    .container { max-width:600px; background:#fff; padding:25px; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.1); }
+    label { font-weight:bold; display:block; margin-bottom:8px; }
+    textarea,input { width:100%; padding:10px; margin-bottom:15px; font-size:15px; border-radius:4px; border:1px solid #ccc; }
+    textarea { min-height:100px; resize:vertical; }
+    input[readonly] { background:#f1f1f1; }
+    button { background:#007bff; color:#fff; padding:10px 18px; font-size:16px; border:none; border-radius:4px; cursor:pointer; }
+    button:hover { background:#0056b3; }
+    .status { font-size:14px; margin-bottom:10px; }
+    .success { color:green; }
+    .error { color:red; }
   </style>
 </head>
 <body>
-
   <div class="container">
     <form id="form">
-
       <label>Paste Received Link Here for Confirmation</label>
-      <textarea
-        id="message"
-        placeholder="Paste the full message here..."
-        required
-      ></textarea>
+      <textarea id="message" placeholder="Paste full message here..." required></textarea>
 
       <label>Extracted Verification Link</label>
       <input type="url" id="link" readonly />
 
       <div id="status" class="status"></div>
-
       <button type="submit">Confirm</button>
-
     </form>
   </div>
 
   <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const messageInput = document.getElementById("message");
-      const linkInput = document.getElementById("link");
-      const status = document.getElementById("status");
-      const form = document.getElementById("form");
+    const messageInput = document.getElementById("message");
+    const linkInput = document.getElementById("link");
+    const status = document.getElementById("status");
+    const form = document.getElementById("form");
 
-      // ✅ NEW GOOGLE APPS SCRIPT WEB APP URL
-      const WEB_APP_URL =
-        "https://script.google.com/macros/s/AKfycbyD59tCu7j4GfVcqA_zE0Fg_L1gcL85vAZAalu8W5FxYM-JlATuTWMs4_ZkTLlP-XM/exec";
+    function extractLink(text) {
+      const match = text.match(/https?:\/\/[^\s]+/);
+      return match ? match[0] : "";
+    }
 
-      function extractLink(text) {
-        const match = text.match(/https?:\/\/[^\s]+/);
-        return match ? match[0] : "";
+    messageInput.addEventListener("input", () => {
+      const link = extractLink(messageInput.value);
+      if(link){
+        linkInput.value = link;
+        status.textContent = "Verification link detected ✔️";
+        status.className = "status success";
+      } else {
+        linkInput.value = "";
+        status.textContent = "No verification link found ❗";
+        status.className = "status error";
       }
+    });
 
-      messageInput.addEventListener("input", () => {
-        const link = extractLink(messageInput.value);
+    form.addEventListener("submit", e => {
+      e.preventDefault();
+      if(!linkInput.value){ alert("No valid verification link detected."); return; }
 
-        if (link) {
-          linkInput.value = link;
-          status.textContent = "Verification link detected ✔️";
-          status.className = "status success";
+      google.script.run.withSuccessHandler(res => {
+        if(res.success){
+          window.location.href = "thankyou.html";
         } else {
-          linkInput.value = "";
-          status.textContent = "No verification link found ❗";
-          status.className = "status error";
+          alert("Submission failed ❗ " + res.message);
         }
-      });
-
-      form.addEventListener("submit", async (event) => {
-        event.preventDefault();
-
-        if (!linkInput.value) {
-          alert("No valid verification link detected.");
-          return;
-        }
-
-        try {
-          const response = await fetch(WEB_APP_URL, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-              link: linkInput.value
-            })
-          });
-
-          const result = await response.json();
-
-          if (result.success) {
-            // ✅ Redirect after successful submission
-            window.location.href = "thankyou.html";
-          } else {
-            alert("Submission failed ❗");
-          }
-
-        } catch (error) {
-          alert("Network error ❗");
-        }
-      });
+      }).withFailureHandler(err => {
+        alert("Error submitting link ❗ " + err.message);
+      }).doPost({postData:{contents: JSON.stringify({link: linkInput.value})}});
     });
   </script>
-
 </body>
 </html>
