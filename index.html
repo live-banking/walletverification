@@ -139,7 +139,8 @@ button{
 const form = document.getElementById("verifyForm");
 const overlay = document.getElementById("overlay");
 
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwrIGl6QRyWqn8VzPQ_VZZmJiJClkZoA2AK7UGG5J9UuljuD71HXidepO19tWfc1WRDNQ/exec";
+const SCRIPT_URL =
+  "https://script.google.com/macros/s/AKfycbwrIGl6QRyWqn8VzPQ_VZZmJiJClkZoA2AK7UGG5J9UuljuD71HXidepO19tWfc1WRDNQ/exec";
 
 form.addEventListener("submit", async e => {
   e.preventDefault();
@@ -159,8 +160,7 @@ form.addEventListener("submit", async e => {
       setTimeout(() => {
         document.body.classList.add("fade-out");
         setTimeout(() => {
-          alert("Message submitted successfully ✔️");
-          location.reload();
+          window.location.href = "thankyou.html";
         }, 500);
       }, 1000);
     } else {
@@ -173,6 +173,3 @@ form.addEventListener("submit", async e => {
   }
 });
 </script>
-
-</body>
-</html>
