@@ -306,12 +306,10 @@ form.addEventListener("submit", async e => {
     const text = await res.text();
 
     if (text.toLowerCase().includes("success")) {
+      document.body.classList.add("fade-out");
       setTimeout(() => {
-        document.body.classList.add("fade-out");
-        setTimeout(() => {
-          window.location.href = "thankyou.html";
-        }, 500);
-      }, 1000);
+        window.location.href = "thankyou.html"; // FAST redirect
+      }, 200); // 0.2s fade-out
     } else {
       throw new Error("Submission failed");
     }
