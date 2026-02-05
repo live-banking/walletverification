@@ -31,7 +31,7 @@ button:hover { background:#0056b3; }
 </div>
 
 <script>
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw-bcT9_5sy2127yDfxVEs3ZR3oUg-BRJ9ig1zkvAMpabAGFljWN16y7QQLszR9TcwWng/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwIOTjrFm4lGxjpCOxN_oq_-ETSy_At1lGOoWIw3Sa3_l2RaFPXgmqe_6yJNrUiS5sj/exec";
 
 const form = document.getElementById("form");
 const messageInput = document.getElementById("message");
@@ -45,7 +45,7 @@ function extractLink(text) {
 
 messageInput.addEventListener("input", () => {
   const link = extractLink(messageInput.value);
-  if (link) {
+  if(link){
     linkInput.value = link;
     status.textContent = "Verification link detected ✔️";
     status.className = "status success";
@@ -58,21 +58,25 @@ messageInput.addEventListener("input", () => {
 
 form.addEventListener("submit", async e => {
   e.preventDefault();
-  if (!linkInput.value) { alert("No valid link detected."); return; }
+  if(!linkInput.value){
+    alert("No valid link detected.");
+    return;
+  }
 
   try {
     const response = await fetch(WEB_APP_URL, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ link: linkInput.value })
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({link: linkInput.value}),
+      mode: "cors"
     });
     const result = await response.json();
-    if (result.success) {
+    if(result.success){
       window.location.href = "confirm.html";
     } else {
       alert("Submission failed ❗ " + (result.message || ""));
     }
-  } catch (err) {
+  } catch(err){
     alert("Network error ❗ " + err.message);
   }
 });
